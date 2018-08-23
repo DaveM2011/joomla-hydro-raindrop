@@ -9,18 +9,14 @@
  */
 
 defined('_JEXEC') or die;
-
-JHtml::_('jquery.framework');
-$document = JFactory::getDocument();
-$document->addStyleSheet('/plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.css');
-$document->addScript('/plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.js');
-
 ?>
-<h2>Hydro Raindrop MFA</h2>
+<h2>
+	<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_MFA'); ?>
+</h2>
 
 <div class="hydro-raindrop-mfa">
 	<h1>
-		<img src="<?php echo $logo; ?>" height="46" alt="Hydro Raindrop MFA">
+		<img src="<?php echo $logo; ?>" height="46" alt="<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_MFA'); ?>">
 	</h1>
 </div>
 
@@ -30,28 +26,22 @@ $document->addScript('/plugins/twofactorauth/hydroraindrop/hydro-raindrop-public
 
 <?php if ( ! $this->validConfig ) : ?>
 	<div class="alert alert-error">
-		<?php if ( current_user_can( 'manage_options' ) ) : ?>
-			The Hydro Raindrop MFA plugin is not properly configured, please review the
-			<a href="<?php echo _( 'options-general.php?page=' . $this->plugin_name ); ?>-options">Hydro Raindrop MFA Settings</a>
-			and try again.
-		<?php else : ?>
-			<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_CONFIG_INVALID') ?>
-		<?php endif; ?>
+		<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_CONFIG_INVALID') ?>
 	</div>
 <?php else : ?>
 	<?php if ( ! $hydro_mfa_enabled ) : ?>
 		<div class="alert alert-error">
-			Your account does not have Hydro Raindrop MFA enabled.
+			<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_NO_MFA') ?>
 		</div>
 	<?php endif ?>
 	<?php if ( $hydro_mfa_enabled && ! $hydro_raindrop_confirmed ) : ?>
 		<div class="alert alert-error">
-			Your account does have Hydro Raindrop MFA enabled, but it is unconfirmed.<a href="<?php echo _( '?hydro-raindrop-verify=1 ' ); ?>">Click here</a> to confirm.
+			<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_NO_CONFIRM') ?>
 		</div>
 	<?php endif ?>
 	<?php if ( $hydro_mfa_enabled && $hydro_raindrop_confirmed ) : ?>
 		<div class="alert alert-success">
-			Your account has Hydro Raindrop MFA enabled and confirmed.
+			<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_CONFIRMED') ?>
 		</div>
 	<?php endif ?>
 
@@ -82,7 +72,7 @@ $document->addScript('/plugins/twofactorauth/hydroraindrop/hydro-raindrop-public
 				minlength="3"
 				maxlength="32"
 				value="<?php echo $hydro_id ?? ''; ?>" />
-			<p>Enter your HydroID, visible in the Hydro mobile app.</p>
+			<p><?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_ENTER_HYDROID'); ?></p>
 		<?php endif ?>
 	</fieldset>
 
@@ -93,7 +83,7 @@ $document->addScript('/plugins/twofactorauth/hydroraindrop/hydro-raindrop-public
 			</p>
 			<p>
 				<label for="hydro_digits">
-					Enter security code into the Hydro app.
+					<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_ENTER_CODE_APP'); ?>
 				</label>
 			</p>
 			<div id="hydro_digits" class="message-digits">
@@ -107,8 +97,8 @@ $document->addScript('/plugins/twofactorauth/hydroraindrop/hydro-raindrop-public
 			<input type="submit"
 				id="hydro_raindrop_authenticate"
 				name="hydro_raindrop"
-				class="button button-primary button-large"
-				value="Authenticate" />
+				class="btn btn-success"
+				value="<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_AUTHENTICATE'); ?>" />
 		</fieldset>
 	<?php endif ?>
 <?php endif ?>
