@@ -13,7 +13,7 @@ A Joomla plugin to integrate Hydro Raindrop MFA
 ## Using unix
 - Clone the repository `git clone https://github.com/DaveM2011/joomla-hydro-raindrop` to anywhere on your server
 - Make sure you have installed composer (https://getcomposer.org/)
-- Decend into the `plg_twofactorauth_hydroraindrop` directory
+- `cd plg_twofactorauth_hydroraindrop`
 - Run composer `composer install`
 - Go back to the main directory `cd ..`
 - Run `chmod +x createPackage.sh && bash createPackage.sh` u might need `sudo` who knows :smile
