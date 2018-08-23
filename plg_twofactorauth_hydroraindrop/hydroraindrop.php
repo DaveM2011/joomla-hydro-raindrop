@@ -281,8 +281,8 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		
 		JHtml::_('jquery.framework');
 		$document = JFactory::getDocument();
-		$document->addStyleSheet(Juri::base() . 'plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.css');
-		$document->addScript(Juri::base() . 'plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.js');
+		$document->addStyleSheet(Juri::root() . 'plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.css');
+		$document->addScript(Juri::root() . 'plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.js');
 		
 		$hydro_id = '';
 		if ($otpConfig->method === $this->methodName) {
@@ -494,7 +494,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			$this->unset_cookie();
 		}
 
-		if (!$this->verify_cookie($this->user->id, $hydro_id) && $hydro_id && $hydro_raindrop_confirmed) {
+		if (!$this->verify_cookie($this->user->id, $hydro_id) && $hydro_id && $hydro_raindrop_confirmed && $just_logged_in) {
 			$show_fma = true;
 		}
 
@@ -564,6 +564,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			'message' => $message,
 			'logo' => JURI::root() . 'plugins/twofactorauth/hydroraindrop/images/logo.svg',
 			'image' => JURI::root() . 'plugins/twofactorauth/hydroraindrop/images/security-code.png',
+			'is_admin' => !$this->app->isClient('site')
 		);
 	}
 
@@ -630,8 +631,8 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	/**
 	 * Get HTTP cookie value.
 	 *
-	 * @param WP_User $user        Currently logged in user.
-	 * @param string  $cookie_name Cookie name.
+	 * @param int $user_id			Currently logged in user.
+	 * @param string $cookie_name	Cookie name.
 	 *
 	 * @return string
 	 */
@@ -648,7 +649,8 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	/**
 	 * Set cookie for current user.
 	 *
-	 * @param WP_User $user Current logged in user.
+	 * @param int $user_id Current logged in user.
+	 * @param string $hydro_id The users hydro_id.
 	 */
 	private function set_cookie($user_id, $hydro_id)
 	{
