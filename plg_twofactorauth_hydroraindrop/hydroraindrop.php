@@ -479,6 +479,15 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			$document = JFactory::getDocument();
 			$input = $this->app->input;
 
+			if ($input->get('cancel_hydro_raindrop')) {
+				$this->unset_cookie();
+				$this->session->clear('id', 'hydro_raindrop');
+				$this->session->clear('confirmed', 'hydro_raindrop');
+				$this->session->clear('reauthenticate', 'hydro_raindrop');
+				$this->app->logout(null);
+				$this->app->redirect('/');
+			}
+
 			$error = null;
 			$message = $this->get_message();
 
