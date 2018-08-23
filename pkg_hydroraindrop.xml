@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.1" type="package" method="upgrade">
+	<name>Hydro Raindrop 2FA</name>
+	<packagename>hydroraindrop</packagename>
+	<author>Dave Morton</author>
+	<creationDate>August 2018</creationDate>
+	<copyright>Copyright (C) 2018. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<authorEmail>davem.2011@gmail.com</authorEmail>
+	<authorUrl>https://github.com/DaveM2011/joomla-hydro-raindrop</authorUrl>
+	<version>0.4.0</version>
+	<description>Allows users on your site to use two factor authentication using Hydrogen Raindrop. To use two factor authentication please edit the user profile and enable two factor authentication.</description>
+	<packagerurl>http://www.yoururl.com/</packagerurl>
+	<update>http://www.updateurl.com/update</update>
+	<scriptfile>pkg_script.php</scriptfile>
+	<files>
+		<file type="plugin" id="hydroraindrop" group="system">plg_system_hydroraindrop.zip</file>
+		<file type="plugin" id="hydroraindrop" group="twofactorauth">plg_twofactorauth_hydroraindrop.zip</file>
+	</files>
+	<updateservers>
+		<server type="extension" priority="1" name="Hydro Raindrop - Joomla Update Server">https://daves.app/updates/hydroraindrop.xml</server>
+	</updateservers>
+</extension>

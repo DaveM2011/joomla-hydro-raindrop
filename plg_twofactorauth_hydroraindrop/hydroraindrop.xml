@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="3.1" type="plugin" group="twofactorauth" method="upgrade">
+	<name>plg_twofactorauth_hydroraindrop</name>
+	<author>Dave Morton</author>
+	<creationDate>August 2018</creationDate>
+	<copyright>Copyright (C) 2018. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<authorEmail>davem.2011@gmail.com</authorEmail>
+	<authorUrl>https://github.com/DaveM2011/joomla-hydro-raindrop</authorUrl>
+	<version>0.4.0</version>
+	<description>PLG_TWOFACTORAUTH_HYDRORAINDROP_XML_DESCRIPTION</description>
+	<files>
+		<filename plugin="hydroraindrop">hydroraindrop.php</filename>
+		<filename>hydro-raindrop-public.css</filename>
+		<filename>hydro-raindrop-public.js</filename>
+		<filename>hydro-raindrop-token.php</filename>
+		<folder>postinstall</folder>
+		<folder>tmpl</folder>
+		<folder>vendor</folder>
+		<folder>images</folder>
+		<folder>layouts</folder>
+	</files>
+	<languages>
+		<language tag="en-GB">en-GB.plg_twofactorauth_hydroraindrop.ini</language>
+		<language tag="en-GB">en-GB.plg_twofactorauth_hydroraindrop.sys.ini</language>
+	</languages>
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+				<field
+					name="section"
+					type="radio"
+					label="PLG_TWOFACTORAUTH_HYDRORAINDROP_SECTION_LABEL"
+					description="PLG_TWOFACTORAUTH_HYDRORAINDROP_SECTION_DESC"
+					default="3"
+					filter="integer"
+					class="btn-group"
+					>
+					<option value="1">PLG_TWOFACTORAUTH_HYDRORAINDROP_SECTION_SITE</option>
+					<option value="2">PLG_TWOFACTORAUTH_HYDRORAINDROP_SECTION_ADMIN</option>
+					<option value="3">PLG_TWOFACTORAUTH_HYDRORAINDROP_SECTION_BOTH</option>
+				</field>
+				<field
+					name="application_id"
+					type="text"
+					label="PLG_TWOFACTORAUTH_HYDRORAINDROP_APPID_LABEL"
+					description="PLG_TWOFACTORAUTH_HYDRORAINDROP_APPID_DESC"
+					default=""
+					required="1"
+					maxlength="36"
+					/>
+				<field
+					name="client_id"
+					type="text"
+					label="PLG_TWOFACTORAUTH_HYDRORAINDROP_CLIENTID_LABEL"
+					description="PLG_TWOFACTORAUTH_HYDRORAINDROP_CLIENTID_DESC"
+					default=""
+					required="1"
+					maxlength="26"
+					/>
+				<field
+					name="client_secret"
+					type="text"
+					label="PLG_TWOFACTORAUTH_HYDRORAINDROP_CLIENTSECRET_LABEL"
+					description="PLG_TWOFACTORAUTH_HYDRORAINDROP_CLIENTSECRET_DESC"
+					default=""
+					required="1"
+					maxlength="26"
+					/>
+				<field
+					name="environment"
+					type="radio"
+					label="PLG_TWOFACTORAUTH_HYDRORAINDROP_ENVIRONMENT_LABEL"
+					description="PLG_TWOFACTORAUTH_HYDRORAINDROP_ENVIRONMENT_DESC"
+					default="production"
+					class="btn-group"
+					>
+					<option value="production">PLG_TWOFACTORAUTH_HYDRORAINDROP_ENVIRONMENT_PRODUCTION</option>
+					<option value="sandbox">PLG_TWOFACTORAUTH_HYDRORAINDROP_ENVIRONMENT_SANDBOX</option>
+				</field>
+				<field
+					name="hydro_salt"
+					type="hidden"
+					default=""
+					/>
+			</fieldset>
+		</fields>
+	</config>
+	<updateservers>
+		<server type="extension" priority="1" name="Hydro Raindrop - Joomla Update Server">https://daves.app/updates/hydroraindrop.xml</server>
+	</updateservers>
+</extension>
