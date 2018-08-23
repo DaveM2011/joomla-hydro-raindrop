@@ -498,7 +498,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 				} else {
 					$this->enqueue('PLG_TWOFACTORAUTH_HYDRORAINDROP_LOGIN_COMPLETE', 'success');
 					$this->session->clear('reauthenticate', 'hydro_raindrop');
-					$this->set_cookie($user->id, $hydro_id);
+					$this->set_cookie($this->user->id, $hydro_id);
 					return;
 				}
 			}
@@ -631,15 +631,8 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	private function set_cookie($user_id, $hydro_id)
 	{
-		//$app = JFactory::getApplication();
 		$cookie = $this->get_cookie_value($user_id, $hydro_id, self::COOKIE_NAME);
-		// @codingStandardsIgnoreLine
-		$result = $this->app->input->cookie->set(self::COOKIE_NAME, $cookie, 0, $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
-		if (!$result) {
-			// if they could not set the cookie would that not mean there monitoring the connection
-			// and havesting data i mean who turns off cookies unless youre hacking in some way
-			$this->enqueue('Could not set cookie.');
-		}
+		$this->app->input->cookie->set(self::COOKIE_NAME, $cookie, 0, $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
 	}
 
 	/**
@@ -652,7 +645,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	private function verify_cookie($userId, $hydroId) : bool
 	{
-		$cookie = $this->app->input->cookie->get(self::COOKIE_NAME, null);
+		$cookie = $this->app->input->cookie->get(self::COOKIE_NAME, null, 'string');
 		if (!$cookie) {
 			//$this->log('Cookie is not set.');
 			return false;
