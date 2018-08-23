@@ -79,9 +79,11 @@
 					<option value="sandbox">PLG_TWOFACTORAUTH_HYDRORAINDROP_ENVIRONMENT_SANDBOX</option>
 				</field>
 				<field
-					name="hydro_salt"
-					type="hidden"
-					default=""
+					name="cookie_timeout"
+					type="number"
+					label="PLG_TWOFACTORAUTH_HYDRORAINDROP_COOKIE_TIMEOUT_LABEL"
+					description="PLG_TWOFACTORAUTH_HYDRORAINDROP_COOKIE_TIMEOUT_DESC"
+					default="90"
 					/>
 			</fieldset>
 		</fields>
