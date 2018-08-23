@@ -16,10 +16,10 @@ extract($displayData);
 ?>
 <style>
 html, body {
-	height: 100%;
+	height: 100% !important;
 }
 .parent {
-	height: 100%;
+	height: 100% !important;
 	position: relative;
 }
 .child {
