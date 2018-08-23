@@ -464,9 +464,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	private function showMfa() {
 		if (!$this->isActiveSection())
 			return;
-        //$app = JFactory::getApplication();
-		//$session = JFactory::getSession();
-		//$user = JFactory::getUser();
 		$just_logged_in = $this->session->get('reauthenticate', false, 'hydro_raindrop');
 		$hydro_id = $this->session->get('id', null, 'hydro_raindrop');
 		$hydro_raindrop_confirmed = $this->session->get('confirmed', false, 'hydro_raindrop');
@@ -475,8 +472,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			$show_fma = true;
 			$this->unset_cookie();
 		}
-		//var_dump($just_logged_in, $hydro_id, $hydro_raindrop_confirmed, $show_fma);
-		if (!$this->verify_cookie($this->user->id, $hydro_id)) {
+		if (!$this->verify_cookie($this->user->id, $hydro_id) && $hydro_id && $hydro_raindrop_confirmed) {
 			$show_fma = true;
 		}
 		if ($show_fma) {
@@ -672,7 +668,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			return false;
 		}
 		list($name, $user_id, $hydro_id, $expire) = $cookie_content;
-		//$user_hash = ( new \Hashids\Hashids( $this->get_salt(), 64 ) )->decode( $userId );
 		$is_valid = self::COOKIE_NAME === $name
 			|| $userId === $user_id
 			|| $hydro_id === $hydroId;
