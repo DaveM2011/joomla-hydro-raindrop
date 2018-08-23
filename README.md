@@ -48,5 +48,5 @@ https://github.com/DaveM2011/joomla-hydro-raindrop/issues
 
 https://github.com/DaveM2011/joomla-hydro-raindrop/issues
 
-## Contributing to Hydro Raindrop WordPress plugin
+## Contributing to Hydro Raindrop Joomla plugin
 If you want to address an issue/bug, please create an issue first.
