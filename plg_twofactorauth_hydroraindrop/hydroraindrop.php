@@ -68,8 +68,25 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	protected $validConfig;
 
+	/**
+	 * Application
+	 *
+	 * @var    JApplication
+	 */
 	protected $app;
+
+	/**
+	 * Session
+	 *
+	 * @var    JSession
+	 */
 	protected $session;
+
+	/**
+	 * User
+	 *
+	 * @var    JUser
+	 */
 	protected $user;
 
 	/**
@@ -77,7 +94,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	public function __construct($subject, $config)
 	{
-		//exit;
 		parent::__construct($subject, $config);
 		// Get the config and parse it
 		$config = json_decode($config['params'], true);
@@ -117,8 +133,19 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	private function log($message, $type = 'error')
 	{
-		//$app = JFactory::getApplication();
-		$this->app->enqueueMessage(JText::_($message), $type);
+		switch ($type) {
+			case 'error':
+				$type = JLog::ERROR;
+			case 'debug':
+				$type = JLog::DEBUG;
+			case 'warning':
+				$type = JLog::WARNING;
+			case 'info':
+				$type = JLog::INFO;
+			default:
+				return;
+		}
+		JLog::add($message, $type, 'hydro-raindrop');
 	}
 
 	/**
@@ -129,7 +156,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	private function enqueue($message, $type = 'error')
 	{
-		//$app = JFactory::getApplication();
 		$this->app->enqueueMessage(JText::_($message), $type);
 	}
 
@@ -167,7 +193,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	public function onUserTwofactorIdentify()
 	{
-		//$user = JFactory::getUser();
 		if ($this->user->guest) {
 			return false;
 		}
@@ -194,8 +219,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		$current_section = 0;
 
 		try {
-			//$app = JFactory::getApplication();
-
 			if ($this->app->isClient('administrator')) {
 				$current_section = 2;
 			} elseif ($this->app->isClient('site')) {
@@ -220,7 +243,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	public function onUserAfterLogin(array $options)
 	{
 		$model = new UsersModelUser;
-		//$session = JFactory::getSession();
 		$user = $options['user'];
 		$otp = $model->getOtpConfig($user->id);
 		if ($otp && isset($otp->config['hydro_id'])) {
@@ -257,7 +279,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		if (!$this->is_ssl())
 			return false;
 		
-		//$session = JFactory::getSession();
 		JHtml::_('jquery.framework');
 		$document = JFactory::getDocument();
 		$document->addStyleSheet('/plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.css');
@@ -318,8 +339,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			return false;
 		}
 		
-		//$app = JFactory::getApplication();
-
 		// Get a reference to the input data object
 		$input = $this->app->input;
 
@@ -360,13 +379,15 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 
 		if (!empty($hydro_id)) {
 			$length = strlen($hydro_id);
+
 			if ($length < 5 || $length > 7) {
 				$this->enqueue('PLG_TWOFACTORAUTH_HYDRORAINDROP_PROVIDE_VALID_HYDROID');
 				return false;
 			}
-			//$user = JFactory::getUser();
+
 			$model = new UsersModelUser;
 			$otp = $model->getOtpConfig($this->user->id);
+
 			try {
 				$this->client->registerUser($hydro_id);
 
@@ -435,8 +456,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 
 	public function onAjaxVerifySignatureLogin()
 	{
-		//$user = JFactory::getUser();
-		//$session = JFactory::getSession();
 		$hydro_id = $this->session->get('id', null, 'hydro_raindrop');
 		$message = $this->get_message();
 
@@ -464,17 +483,21 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	private function showMfa() {
 		if (!$this->isActiveSection())
 			return;
+		
 		$just_logged_in = $this->session->get('reauthenticate', false, 'hydro_raindrop');
 		$hydro_id = $this->session->get('id', null, 'hydro_raindrop');
 		$hydro_raindrop_confirmed = $this->session->get('confirmed', false, 'hydro_raindrop');
 		$show_fma = false;
+
 		if (!$this->user->guest && $just_logged_in && $hydro_id && $hydro_raindrop_confirmed) {
 			$show_fma = true;
 			$this->unset_cookie();
 		}
+
 		if (!$this->verify_cookie($this->user->id, $hydro_id) && $hydro_id && $hydro_raindrop_confirmed) {
 			$show_fma = true;
 		}
+
 		if ($show_fma) {
 			$document = JFactory::getDocument();
 			$input = $this->app->input;
@@ -552,7 +575,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	private function get_message($new = false) : int
 	{
-		//$session = JFactory::getSession();
 		$message = $this->session->get('message', null, 'hydro_raindrop');
 		if (!$message || $new) {
 			$message = $this->client->generateMessage();
@@ -567,7 +589,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 * @return bool
 	 */
 	private function is_ssl() {
-		//$app = JFactory::getApplication();
 		if ($this->app->isSSLConnection())
 			return true;
 		return false;
@@ -692,6 +713,5 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	public function unset_cookie() {
 		$this->app->input->cookie->set(self::COOKIE_NAME, '', strtotime('-1 day'), $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
-		//setcookie(self::COOKIE_NAME, '', strtotime('-1 day'), $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
 	}
 }
