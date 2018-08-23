@@ -539,7 +539,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 
 			JHtml::_('jquery.framework');
 			$document->setBuffer($html, 'component');
-			$document->addStyleSheet('/plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.css');
+			$document->addStyleSheet(Juri::root() . 'plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.css');
 			//$document->addScript('/plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.js');
 
 			echo $document->render(false, array(
