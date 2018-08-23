@@ -6,6 +6,10 @@ Welcome to the Hydro Raindrop Joomla plugin repository on GitHub.
 
 The `Joomla Hydro Raindrop` plugin provides Hydro Raindrop Multi Factor Authentication to your Joomla site.
 
+## Installation
+
+Download from extensions.joomla.org (soon available).
+
 ## Using windows
 - Clone the repository `git clone https://github.com/DaveM2011/joomla-hydro-raindrop` to anywhere on your computer
 - Make sure you have installed composer (https://getcomposer.org/)
