@@ -281,8 +281,8 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		
 		JHtml::_('jquery.framework');
 		$document = JFactory::getDocument();
-		$document->addStyleSheet('/plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.css');
-		$document->addScript('/plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.js');
+		$document->addStyleSheet(Juri::base() . 'plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.css');
+		$document->addScript(Juri::base() . 'plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.js');
 		
 		$hydro_id = '';
 		if ($otpConfig->method === $this->methodName) {
