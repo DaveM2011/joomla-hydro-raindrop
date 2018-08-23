@@ -86,7 +86,4 @@
 			</fieldset>
 		</fields>
 	</config>
-	<updateservers>
-		<server type="extension" priority="1" name="Hydro Raindrop - Joomla Update Server">https://daves.app/updates/hydroraindrop.xml</server>
-	</updateservers>
 </extension>

@@ -17,7 +17,4 @@
 		<file type="plugin" id="hydroraindrop" group="system">plg_system_hydroraindrop.zip</file>
 		<file type="plugin" id="hydroraindrop" group="twofactorauth">plg_twofactorauth_hydroraindrop.zip</file>
 	</files>
-	<updateservers>
-		<server type="extension" priority="1" name="Hydro Raindrop - Joomla Update Server">https://daves.app/updates/hydroraindrop.xml</server>
-	</updateservers>
 </extension>
