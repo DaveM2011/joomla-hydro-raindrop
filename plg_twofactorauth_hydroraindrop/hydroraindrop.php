@@ -146,6 +146,9 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 				return false;
 			}
 		}
+		$app = JFactory::getApplication();
+		if (!$app->isSSLConnection())
+			return false;
 		return true;
 	}
 
