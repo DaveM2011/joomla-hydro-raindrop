@@ -7,7 +7,7 @@ A Joomla plugin to integrate Hydro Raindrop MFA
 - Decend into the `plg_twofactorauth_hydroraindrop` directory
 - Run composer `composer install`
 - Go back to the `joomla-hydro-raindrop` directory
-- Right click `CreatePackage.ps1` and click `Run with PowerShell`
+- Right click `CreatePackage.ps1` and click `Run with PowerShell` note `7Zip` needs to be installed to use this
 - Congrats you should have a `pkg_hydroraindrop.zip` file now this is the package you install
 
 ## Using unix
