@@ -8,7 +8,7 @@
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>davem.2011@gmail.com</authorEmail>
 	<authorUrl>https://github.com/DaveM2011/joomla-hydro-raindrop</authorUrl>
-	<version>0.4.0</version>
+	<version>1.0.0</version>
 	<description>Allows users on your site to use two factor authentication using Hydrogen Raindrop. To use two factor authentication please edit the user profile and enable two factor authentication.</description>
 	<packagerurl>http://www.yoururl.com/</packagerurl>
 	<update>http://www.updateurl.com/update</update>

@@ -634,7 +634,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		//$app = JFactory::getApplication();
 		$cookie = $this->get_cookie_value($user_id, $hydro_id, self::COOKIE_NAME);
 		// @codingStandardsIgnoreLine
-		$result = setcookie(self::COOKIE_NAME, $cookie, 0, $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
+		$result = $this->app->input->cookie->set(self::COOKIE_NAME, $cookie, 0, $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
 		if (!$result) {
 			// if they could not set the cookie would that not mean there monitoring the connection
 			// and havesting data i mean who turns off cookies unless youre hacking in some way
@@ -652,13 +652,13 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	private function verify_cookie($userId, $hydroId) : bool
 	{
-		// @codingStandardsIgnoreLine
-		if (!isset($_COOKIE[self::COOKIE_NAME])) {
+		$cookie = $this->app->input->cookie->get(self::COOKIE_NAME, null);
+		if (!$cookie) {
 			//$this->log('Cookie is not set.');
 			return false;
 		}
 		// @codingStandardsIgnoreLine
-		$cookie_list = explode('|', $_COOKIE[self::COOKIE_NAME]);
+		$cookie_list = explode('|', $cookie);
 		if (count($cookie_list) !== 2) {
 			$this->enqueue('Cookie contents are not valid (2).');
 			return false;
@@ -698,7 +698,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 * @return void
 	 */
 	public function unset_cookie() {
-		//$app = JFactory::getApplication();
-		setcookie(self::COOKIE_NAME, '', strtotime('-1 day'), $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
+		$this->app->input->cookie->set(self::COOKIE_NAME, '', strtotime('-1 day'), $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
+		//setcookie(self::COOKIE_NAME, '', strtotime('-1 day'), $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
 	}
 }
