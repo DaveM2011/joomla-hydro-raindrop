@@ -40,6 +40,9 @@ If you don't have a **Hydrogen Developer Account**, go to [www.hydrogenplatform.
 4. Go to your proflle on the frontend site of Joomla find the `Two Factor Authentication` settings and change to `Hydro Raindrop`, enter your HydroID in the `Hydro Raindrop MFA` section.
 5. Follow the verification procedure to activate MFA for your account.
 
+## Removal
+- Remember to use the package uninstaller instead of individual subpackage uninstallers to avoid orphan extension entries in the extension manager.
+
 ## Requirements
 
 * **SSL MUST be enabled for MFA to work.**
