@@ -124,9 +124,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		// Load the helper and model used for two factor authentication
 		JLoader::register('UsersModelUser', JPATH_ADMINISTRATOR . '/components/com_users/models/user.php');
 		JLoader::import('joomla.filesystem.file');
-
-		var_dump($this);
-		exit;
 	}
 
 	/**
@@ -492,8 +489,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		if (!$this->isActiveSection())
 			return;
 
-		var_dump($this->validConfig, $this->session);
-		exit;
 		$just_logged_in = $this->session->get('reauthenticate', false, 'hydro_raindrop');
 		$hydro_id = $this->session->get('id', null, 'hydro_raindrop');
 		$hydro_raindrop_confirmed = $this->session->get('confirmed', false, 'hydro_raindrop');
