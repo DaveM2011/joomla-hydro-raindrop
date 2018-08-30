@@ -1,5 +1,16 @@
 <?php
 declare (strict_types = 1);
+
+/**
+ * @package     Joomla.Plugin
+ * @subpackage  Twofactorauth.hydroraindrop
+ *
+ * @copyright   Copyright (C) 2005 - 2018 Open Source Matters, Inc. All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
+defined('_JEXEC') or die;
+
 use Adrenth\Raindrop\ApiAccessToken;
 use Adrenth\Raindrop\Exception\UnableToAcquireAccessToken;
 use Adrenth\Raindrop\TokenStorage\TokenStorage;

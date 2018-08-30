@@ -14,13 +14,9 @@ defined('_JEXEC') or die;
 	<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_MFA'); ?>
 </legend>
 
-<div class="hydro-raindrop-mfa">
-	<h1>
-		<img src="<?php echo $logo; ?>" height="46" alt="<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_MFA'); ?>">
-	</h1>
-</div>
-
-<div class="well">
+<div class="well hydro-raindrop-mfa">
+	<img src="<?php echo $logo; ?>" height="46" alt="<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_MFA'); ?>">
+	<br /><br />
 	<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_INTRO') ?>
 </div>
 

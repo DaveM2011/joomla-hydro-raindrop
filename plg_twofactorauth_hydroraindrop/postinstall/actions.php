@@ -11,6 +11,8 @@
  * two-factor authentication code.
  */
 
+defined('_JEXEC') or die;
+
 /**
  * Checks if the plugin is enabled. If not it returns true, meaning that the
  * message concerning two factor authentication should be displayed.

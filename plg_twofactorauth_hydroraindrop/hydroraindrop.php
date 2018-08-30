@@ -194,10 +194,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	public function onUserTwofactorIdentify()
 	{
-		if ($this->user->guest) {
-			return false;
-		}
-
 		if (!$this->isActiveSection()) {
 			return false;
 		}
@@ -243,6 +239,9 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	public function onUserAfterLogin(array $options)
 	{
+		if (!$this->validConfig) {
+			return false;
+		}
 		$model = new UsersModelUser;
 		$user = $options['user'];
 		$otp = $model->getOtpConfig($user->id);
@@ -277,8 +276,9 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	public function onUserTwofactorShowConfiguration($otpConfig, $user_id = null)
 	{
-		if (!$this->is_ssl())
+		if (!$this->validConfig) {
 			return false;
+		}
 		
 		JHtml::_('jquery.framework');
 		$document = JFactory::getDocument();
@@ -336,6 +336,9 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	public function onUserTwofactorApplyConfiguration($method)
 	{
+		if (!$this->validConfig) {
+			return false;
+		}
 		if ($method !== $this->methodName) {
 			return false;
 		}
@@ -445,6 +448,9 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 
 	private function verifyMessage(string $hydro_id, string $message) : bool
 	{
+		if (!$this->validConfig) {
+			return false;
+		}
 		try {
 			$data = $this->client->verifySignature($hydro_id, $message);
 			if ($data)
@@ -457,6 +463,9 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 
 	public function onAjaxVerifySignatureLogin()
 	{
+		if (!$this->validConfig) {
+			return false;
+		}
 		$hydro_id = $this->session->get('id', null, 'hydro_raindrop');
 		$message = $this->get_message();
 

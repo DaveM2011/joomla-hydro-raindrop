@@ -6,6 +6,10 @@ Welcome to the Hydro Raindrop Joomla plugin repository on GitHub.
 
 The `Joomla Hydro Raindrop` plugin provides Hydro Raindrop Multi Factor Authentication to your Joomla site.
 
+Grab the mobile application for your device ethier from
+[Get it on Google Play](https://play.google.com/store/apps/details?id=com.hydrogenplatform.hydro) or
+[iTunes Store](https://itunes.apple.com/app/id1406519814)
+
 ## Installation
 
 Download from extensions.joomla.org (soon available).
@@ -37,7 +41,7 @@ If you don't have a **Hydrogen Developer Account**, go to [www.hydrogenplatform.
 1. Go to `Extensions -> Plugins` search for `Hydro` you will **note there are 2 plugins listed this is because the administration area of joomla requires a seperate plugin to handle the administration if you dont plan on using Hydro's 2FA on your admin you can safely disable this**
 2. Select the `Two Factor Authentication - Hydro Raindrop MFA` plugin to edit its configuration
 3. Enter your `Application ID`, `Client ID` & `Client Secret` change the `Status` to `Enabled` and then `Save & Close`
-4. Go to your proflle on the frontend site of Joomla find the `Two Factor Authentication` settings and change to `Hydro Raindrop`, enter your HydroID in the `Hydro Raindrop MFA` section.
+4. Go to your profile on the frontend site of Joomla find the `Two Factor Authentication` settings and change to `Hydro Raindrop`, enter your HydroID in the `Hydro Raindrop MFA` section.
 5. Follow the verification procedure to activate MFA for your account.
 
 ## Removal
