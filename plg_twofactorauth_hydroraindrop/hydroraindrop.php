@@ -446,7 +446,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		return true;
 	}
 
-	private function verifyMessage(string $hydro_id, string $message) : bool
+	private function verifyMessage(string $hydro_id, int $message) : bool
 	{
 		if (!$this->validConfig) {
 			return false;
