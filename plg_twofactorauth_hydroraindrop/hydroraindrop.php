@@ -101,7 +101,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		// Store some stuffs we need
 		$this->session = JFactory::getSession();
 		$this->user = JFactory::getUser();
-		
+
 		// Get the config and parse it
 		$config = json_decode($config['params'], true);
 		// Validate the config
@@ -531,6 +531,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 					$this->enqueue('PLG_TWOFACTORAUTH_HYDRORAINDROP_LOGIN_COMPLETE', 'success');
 					$this->session->clear('reauthenticate', 'hydro_raindrop');
 					$this->set_cookie($this->user->id, $hydro_id);
+					return;
 				}
 			}
 			
