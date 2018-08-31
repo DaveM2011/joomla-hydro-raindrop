@@ -594,7 +594,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 * @return void
 	 * @throws Exception When message could not be generated.
 	 */
-	private function clean(bool $session = false, bool $logout = false) : void
+	private function clean(bool $session = false, bool $logout = false)
 	{
 		// check if the user in on the frontend
 		if (!$this->validConfig || !$this->app->isClient('site'))
