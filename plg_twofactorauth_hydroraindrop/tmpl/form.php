@@ -32,7 +32,7 @@ defined('_JEXEC') or die;
 	<?php endif ?>
 	<?php if ( ! $hydro_mfa_enabled ) : ?>
 		<div class="alert alert-error">
-			<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_NO_MFA') ?>
+			<?php echo JText::_($is_admin ? 'PLG_TWOFACTORAUTH_HYDRORAINDROP_ADMIN_NO_MFA' : 'PLG_TWOFACTORAUTH_HYDRORAINDROP_NO_MFA') ?>
 		</div>
 	<?php endif ?>
 	<?php if ( $hydro_mfa_enabled && ! $hydro_raindrop_confirmed ) : ?>
@@ -42,7 +42,7 @@ defined('_JEXEC') or die;
 	<?php endif ?>
 	<?php if ( $hydro_mfa_enabled && $hydro_raindrop_confirmed ) : ?>
 		<div class="alert alert-success">
-			<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_CONFIRMED') ?>
+			<?php echo JText::_($is_admin ? 'PLG_TWOFACTORAUTH_HYDRORAINDROP_ADMIN_CONFIRMED' : 'PLG_TWOFACTORAUTH_HYDRORAINDROP_CONFIRMED') ?>
 		</div>
 	<?php endif ?>
 
