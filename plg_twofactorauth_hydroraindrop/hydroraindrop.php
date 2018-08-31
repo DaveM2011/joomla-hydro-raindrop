@@ -123,7 +123,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		);
 
 		// Load the helper and model used for two factor authentication
-		//JLoader::register('UsersModelUser', JPATH_ADMINISTRATOR . '/components/com_users/models/user.php');
+		JLoader::register('UsersModelUser', JPATH_ADMINISTRATOR . '/components/com_users/models/user.php');
 		JLoader::import('joomla.filesystem.file');
 	}
 

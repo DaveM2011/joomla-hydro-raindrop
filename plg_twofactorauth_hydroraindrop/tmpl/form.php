@@ -55,11 +55,12 @@ defined('_JEXEC') or die;
 	<?php endif ?>
 	<div class="clear"></div>
 	<br />
+	<?php if ( $user_is_user ) : ?>
 	<fieldset class="hydro-raindrop-mfa">
 		<legend>
 			<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_HYDROID') ?>
 		</legend>
-		<?php if ( $hydro_mfa_enabled && $hydro_raindrop_confirmed && $user_is_user ) : ?>
+		<?php if ( $hydro_mfa_enabled && $hydro_raindrop_confirmed ) : ?>
 			<input type="text"
 				class="input-small"
 				name="jform[twofactor][hydroraindrop][hydro_id]"
@@ -68,7 +69,7 @@ defined('_JEXEC') or die;
 				maxlength="7"
 				value="<?php echo $hydro_id; ?>"
 				readonly />
-		<?php elseif ( $user_is_user ) : ?>
+		<?php else : ?>
 			<p>
 				<label>
 					<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_ENTER_HYDROID'); ?>
@@ -85,7 +86,7 @@ defined('_JEXEC') or die;
 				value="<?php echo $hydro_id ?? ''; ?>" />
 		<?php endif ?>
 	</fieldset>
-
+	<?php endif ?>
 	<?php if ( ( ! $is_admin || $user_is_user ) && $hydro_mfa_enabled && ! $hydro_raindrop_confirmed ) : ?>
 		<fieldset class="hydro-raindrop-mfa">
 			<p class="hydro-illustration">
