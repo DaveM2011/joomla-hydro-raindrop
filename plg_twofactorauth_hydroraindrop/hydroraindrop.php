@@ -98,17 +98,16 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		parent::__construct($subject, $config);
 		// Link the app first
 		$this->app = JFactory::getApplication();
-
+		// Store some stuffs we need
+		$this->session = JFactory::getSession();
+		$this->user = JFactory::getUser();
+		
 		// Get the config and parse it
 		$config = json_decode($config['params'], true);
 		// Validate the config
 		if (!$this->validateHydroRaindropConfig($config))
 			return;
 		$this->validConfig = true;
-
-		// Store some stuffs we need
-		$this->session = JFactory::getSession();
-		$this->user = JFactory::getUser();
 
 		// Setup the client
 		$this->client = new Client(
@@ -182,7 +181,8 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			}
 		}
 		if (!$this->is_ssl()) {
-			$this->app->enqueueMessage(JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_SSL_WARNING'), 'warning');
+			if ($this->user->authorise('core.admin'))
+				$this->app->enqueueMessage(JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_SSL_WARNING'), 'warning');
 			$this->clean(true);
 			return false;
 		}
