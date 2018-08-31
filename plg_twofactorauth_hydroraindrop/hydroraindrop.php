@@ -182,10 +182,10 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			}
 		}
 		if (!$this->is_ssl()) {
-			// Show a warning if SSL not enabled
 			$this->app->enqueueMessage(JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_SSL_WARNING'), 'warning');
 			return false;
 		}
+		//$this->app->enqueueMessage(JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_SSL_WARNING'), 'warning');
 		return true;
 	}
 
@@ -486,6 +486,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			JFactory::getDbo()->updateObject('#__users', $updates, 'id');
 			return true;
 		}
+		$this->enqueue('PLG_TWOFACTORAUTH_HYDRORAINDROP_AUTHENTICATE_ERROR');
 		return false;
 	}
 
@@ -556,11 +557,14 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			// Stop output buffering and get the form contents
 			$html = @ob_get_clean();
 
-			JHtml::_('jquery.framework');
+			//lets get the site title
+			$config = JFactory::getConfig();
+			$sitename = $config->get('sitename');
+
 			$document->setBuffer($html, 'component');
 			$document->addStyleSheet(Juri::root() . 'plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.css');
-			//$document->addScript('/plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.js');
-
+			$document->addStyleDeclaration($this->params->get('custom_css', ''));
+			$document->setHeadData(array('title' => $sitename . ' - Hydro Raindrop MFA'));
 			echo $document->render(false, array(
 				'template' => $this->app->getTemplate(),
 				'file' => 'component.php'
