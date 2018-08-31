@@ -399,7 +399,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 				return (object)array(
 					'method' => 'hydroraindrop',
 					'config' => array(
-						'hydro_id' => (int)$hydro_id,
+						'hydro_id' => $hydro_id,
 						'hydro_raindrop_confirmed' => $hydro_id == $otp->config['hydro_id'] ? $otp->config['hydro_raindrop_confirmed'] : 0
 					),
 					'otep' => array()
