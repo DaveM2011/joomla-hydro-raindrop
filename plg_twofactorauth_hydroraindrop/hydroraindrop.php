@@ -591,7 +591,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 * @param bool $session Clear the session data.
 	 * @param bool $logout Log the user out.
 	 * 
-	 * @return void
 	 * @throws Exception When message could not be generated.
 	 */
 	private function clean(bool $session = false, bool $logout = false)
