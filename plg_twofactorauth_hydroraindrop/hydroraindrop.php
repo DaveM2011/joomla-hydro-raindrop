@@ -199,7 +199,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	public function onUserTwofactorIdentify()
 	{
-		if (!$this->isActiveSection() || $this->user->guest) {
+		if (!$this->validConfig || !$this->isActiveSection() || $this->user->guest) {
 			return false;
 		}
 		
@@ -596,7 +596,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	private function clean(bool $session = false, bool $logout = false) : void
 	{
 		// check if the user in on the frontend
-		if (!$this->app->isClient('site'))
+		if (!$this->validConfig || !$this->app->isClient('site'))
 			return;
 		// remove the cookie
 		$this->app->input->cookie->set(self::COOKIE_NAME, '', strtotime('-1 day'), $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
