@@ -123,7 +123,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		);
 
 		// Load the helper and model used for two factor authentication
-		JLoader::register('UsersModelUser', JPATH_ADMINISTRATOR . '/components/com_users/models/user.php');
+		//JLoader::register('UsersModelUser', JPATH_ADMINISTRATOR . '/components/com_users/models/user.php');
 		JLoader::import('joomla.filesystem.file');
 	}
 
@@ -265,6 +265,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 * @return void
 	 */
 	public function onAfterRoute() {
+		$this->need_unregister();
 		$this->showMfa();
 	}
 
@@ -290,20 +291,10 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		$document->addStyleSheet(Juri::root() . 'plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.css');
 		$document->addScript(Juri::root() . 'plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.js');
 		
-		$hydro_id = '';
 		$hydro_id = isset ($otpConfig->config['hydro_id']) ? $otpConfig->config['hydro_id'] : '';
 		if ($otpConfig->method === $this->methodName) {
 			// This method is already activated. Reuse the same hydro id.
 			$this->session->set('id', $hydro_id, 'hydro_raindrop');
-		} else {
-			if (!empty($hydro_id)) {
-				try {
-					$this->client->unregisterUser($hydro_id);
-				} catch (UnregisterUserFailed $e) {
-					$this->enqueue($e->getMessage());
-				}
-			}
-			$this->clean(true);
 		}
 		
 		$hydro_mfa_enabled = (bool)$otpConfig->method == $this->methodName && $hydro_id;
@@ -320,7 +311,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		// Start output buffering
 		@ob_start();
 
-		extract($this->view_data($message, $error));
+		extract($this->view_data($message, $error, $user_id));
 
 		if (JFile::exists($path . '/form.php')) {
 			include_once $path . '/form.php';
@@ -351,13 +342,13 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	public function onUserTwofactorApplyConfiguration($method)
 	{
-		if (!$this->validConfig || $method !== $this->methodName) {
+		if (!$this->validConfig) {
 			return false;
 		}
 
 		// Get a reference to the input data object
 		$input = $this->app->input;
-
+		
 		// Load raw data
 		$rawData = $input->get('jform', array(), 'array');
 
@@ -379,7 +370,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		}
 
 		$hydro_id = $data['hydro_id'];
-
+		
 		if (!empty($hydro_id)) {
 			$length = strlen($hydro_id);
 
@@ -541,7 +532,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			@ob_start();
 
 			$layout = new JLayoutFile('mfa', __DIR__ . '/layouts', array('debug' => false, 'client' => 1, 'component' => 'com_login'));
-			echo $layout->render($this->view_data($message));
+			echo $layout->render($this->view_data($message, null, $this->user->id));
 
 			// Stop output buffering and get the form contents
 			$html = @ob_get_clean();
@@ -569,7 +560,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 * @var string
 	 * @return array
 	 */
-	private function view_data($message, $error = null)
+	private function view_data($message, $error = null, $user_id = null)
 	{
 		// Get the current users OTP config
 		$model = new UsersModelUser;
@@ -581,7 +572,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			'logo' => JURI::root() . 'plugins/twofactorauth/hydroraindrop/images/logo.svg',
 			'image' => JURI::root() . 'plugins/twofactorauth/hydroraindrop/images/security-code.png',
 			'is_admin' => !$this->app->isClient('site'),
-			'user_is_user' => isset ($otp->config['hydro_id']) && $this->session->get('id', null, 'hydro_raindrop') == $otp->config['hydro_id']
+			'user_is_user' => $this->user->id == $user_id
 		);
 	}
 
@@ -611,6 +602,28 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		{
 			$this->app->logout(null);
 			$this->app->redirect('/');
+		}
+	}
+
+	private function need_unregister() {
+		// Get a reference to the input data object
+		$input = $this->app->input;
+		// Load raw data
+		$rawData = $input->get('jform', array(), 'array');
+		if (!isset($rawData['twofactor']['hydroraindrop'])) {
+			return false;
+		}
+		$data = $rawData['twofactor']['hydroraindrop'];
+		if (isset($rawData['twofactor']['method']) && $rawData['twofactor']['method'] == 'none') {
+			$hydro_id = isset($data['hydro_id']) ? $data['hydro_id'] : '';
+			if (!empty($hydro_id)) {
+				try {
+					$this->client->unregisterUser($hydro_id);
+				} catch (UnregisterUserFailed $e) {
+					$this->enqueue($e->getMessage());
+				}
+				$this->clean(true);
+			}
 		}
 	}
 
