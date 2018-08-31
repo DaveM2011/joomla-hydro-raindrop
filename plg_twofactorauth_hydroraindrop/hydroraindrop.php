@@ -96,6 +96,9 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	public function __construct($subject, $config)
 	{
 		parent::__construct($subject, $config);
+		// Link the app first
+		$this->app = JFactory::getApplication();
+
 		// Get the config and parse it
 		$config = json_decode($config['params'], true);
 		// Validate the config
@@ -104,7 +107,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		$this->validConfig = true;
 
 		// Store some stuffs we need
-		$this->app = JFactory::getApplication();
 		$this->session = JFactory::getSession();
 		$this->user = JFactory::getUser();
 
@@ -179,8 +181,11 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 				return false;
 			}
 		}
-		if (!$this->is_ssl())
+		if (!$this->is_ssl()) {
+			// Show a warning if SSL not enabled
+			$this->app->enqueueMessage(JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_SSL_WARNING'), 'warning');
 			return false;
+		}
 		return true;
 	}
 
@@ -259,7 +264,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 *
 	 * @return void
 	 */
-	public function onAfterDispatch() {
+	public function onAfterRoute() {
 		$this->showMfa();
 	}
 

@@ -86,6 +86,16 @@
 					default="90"
 					/>
 			</fieldset>
+			<fieldset name="twofactorauth_hydroraindrop_theme">
+				<field
+					name="custom_css"
+					type="textarea"
+					label="PLG_TWOFACTORAUTH_HYDRORAINDROP_CUSTOM_CSS_LABEL"
+					description="PLG_TWOFACTORAUTH_HYDRORAINDROP_CUSTOM_CSS_DESC"
+					default=""
+					rows="10"
+					/>
+			</fieldset>
 		</fields>
 	</config>
 </extension>
