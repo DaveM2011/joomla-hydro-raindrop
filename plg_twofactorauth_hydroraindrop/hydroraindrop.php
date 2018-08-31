@@ -199,10 +199,10 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	public function onUserTwofactorIdentify()
 	{
-		if (!$this->isActiveSection()) {
+		if (!$this->isActiveSection() || $this->user->guest) {
 			return false;
 		}
-
+		
 		return (object)array(
 			'method' => $this->methodName,
 			'title' => JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_METHOD_TITLE')
@@ -313,10 +313,14 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		// Include the form.php from a template override. If none is found use the default.
 		$path = FOFPlatform::getInstance()->getTemplateOverridePath('plg_twofactorauth_hydroraindrop', true);
 
+		$error = $this->session->get('mfa_error', null, 'hydro_raindrop');
+		if ($error)
+			$this->session->clear('mfa_error', 'hydro_raindrop');
+		
 		// Start output buffering
 		@ob_start();
 
-		extract($this->view_data($message));
+		extract($this->view_data($message, $error));
 
 		if (JFile::exists($path . '/form.php')) {
 			include_once $path . '/form.php';
@@ -347,13 +351,10 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 */
 	public function onUserTwofactorApplyConfiguration($method)
 	{
-		if (!$this->validConfig) {
+		if (!$this->validConfig || $method !== $this->methodName) {
 			return false;
 		}
-		if ($method !== $this->methodName) {
-			return false;
-		}
-		
+
 		// Get a reference to the input data object
 		$input = $this->app->input;
 
@@ -479,7 +480,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			JFactory::getDbo()->updateObject('#__users', $updates, 'id');
 			return true;
 		}
-		$this->enqueue('PLG_TWOFACTORAUTH_HYDRORAINDROP_ERR_VALIDATIONFAILED');
+		$this->session->set('mfa_error', 'PLG_TWOFACTORAUTH_HYDRORAINDROP_ERR_VALIDATIONFAILED', 'hydro_raindrop');
 		return false;
 	}
 
@@ -567,14 +568,19 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 * @var string
 	 * @return array
 	 */
-	private function view_data($message)
+	private function view_data($message, $error = null)
 	{
+		// Get the current users OTP config
+		$model = new UsersModelUser;
+		$otp = $model->getOtpConfig($this->user->id);
+
 		return array(
-			'error' => null,
+			'error' => $error,
 			'message' => $message,
 			'logo' => JURI::root() . 'plugins/twofactorauth/hydroraindrop/images/logo.svg',
 			'image' => JURI::root() . 'plugins/twofactorauth/hydroraindrop/images/security-code.png',
-			'is_admin' => !$this->app->isClient('site')
+			'is_admin' => !$this->app->isClient('site'),
+			'user_is_user' => isset ($otp->config['hydro_id']) && $this->session->get('id', null, 'hydro_raindrop') == $otp->config['hydro_id']
 		);
 	}
 

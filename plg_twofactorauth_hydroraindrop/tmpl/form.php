@@ -25,6 +25,11 @@ defined('_JEXEC') or die;
 		<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_CONFIG_INVALID') ?>
 	</div>
 <?php else : ?>
+	<?php if ( $error ) : ?>
+		<div class="alert alert-error">
+			<?php echo JText::_($error) ?>
+		</div>
+	<?php endif ?>
 	<?php if ( ! $hydro_mfa_enabled ) : ?>
 		<div class="alert alert-error">
 			<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_NO_MFA') ?>
@@ -32,7 +37,7 @@ defined('_JEXEC') or die;
 	<?php endif ?>
 	<?php if ( $hydro_mfa_enabled && ! $hydro_raindrop_confirmed ) : ?>
 		<div class="alert alert-error">
-			<?php echo JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_NO_CONFIRM') ?>
+			<?php echo JText::_($is_admin ? 'PLG_TWOFACTORAUTH_HYDRORAINDROP_ADMIN_NO_CONFIRM' : 'PLG_TWOFACTORAUTH_HYDRORAINDROP_NO_CONFIRM') ?>
 		</div>
 	<?php endif ?>
 	<?php if ( $hydro_mfa_enabled && $hydro_raindrop_confirmed ) : ?>
@@ -45,7 +50,7 @@ defined('_JEXEC') or die;
 		<?php if ( $is_admin ) : ?>
 			<button class="btn" onclick="document.getElementById('jform_twofactor_method').value='none';Joomla.submitbutton('user.apply')">Unregister Raindrop MFA</button>
 		<?php else: ?>
-			<button class="btn" onclick="document.getElementById('jform_twofactor_method').value='none'">Unregister Raindrop MFA</button>
+			<button class="btn" onclick="document.getElementById('jform_twofactor_method').value='none'" type="submit">Unregister Raindrop MFA</button>
 		<?php endif ?>
 	<?php endif ?>
 	<div class="clear"></div>
@@ -81,7 +86,7 @@ defined('_JEXEC') or die;
 		<?php endif ?>
 	</fieldset>
 
-	<?php if ( $hydro_mfa_enabled && ! $hydro_raindrop_confirmed ) : ?>
+	<?php if ((!$is_admin || $user_is_user) && $hydro_mfa_enabled && ! $hydro_raindrop_confirmed ) : ?>
 		<fieldset class="hydro-raindrop-mfa">
 			<p class="hydro-illustration">
 				<img src="<?php echo $image; ?>" width="180" alt="">
