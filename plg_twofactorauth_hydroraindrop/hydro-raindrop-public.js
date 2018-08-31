@@ -13,8 +13,7 @@
 				method: "POST",
 				data: request
 			} ).done( function ( msg ) {
-				console.log( msg, msg.data );
-				if (msg.data[0] == true) window.location.reload();
+				window.location.reload();
 			} );
 			return false;
 		} );
