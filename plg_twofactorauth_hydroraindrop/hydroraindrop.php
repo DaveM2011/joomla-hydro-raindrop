@@ -183,9 +183,9 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		}
 		if (!$this->is_ssl()) {
 			$this->app->enqueueMessage(JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_SSL_WARNING'), 'warning');
+			$this->clean(true);
 			return false;
 		}
-		//$this->app->enqueueMessage(JText::_('PLG_TWOFACTORAUTH_HYDRORAINDROP_SSL_WARNING'), 'warning');
 		return true;
 	}
 
@@ -251,7 +251,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		$user = $options['user'];
 		$otp = $model->getOtpConfig($user->id);
 		if ($otp && isset($otp->config['hydro_id'])) {
-			$this->unset_cookie();
+			$this->clean();
 			$this->session->set('id', $otp->config['hydro_id'], 'hydro_raindrop');
 			$this->session->set('confirmed', $otp->config['hydro_raindrop_confirmed'], 'hydro_raindrop');
 			$this->session->set('reauthenticate', true, 'hydro_raindrop');
@@ -291,15 +291,21 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		$document->addScript(Juri::root() . 'plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.js');
 		
 		$hydro_id = '';
+		$hydro_id = isset ($otpConfig->config['hydro_id']) ? $otpConfig->config['hydro_id'] : '';
 		if ($otpConfig->method === $this->methodName) {
 			// This method is already activated. Reuse the same hydro id.
-			$hydro_id = $otpConfig->config['hydro_id'];
 			$this->session->set('id', $hydro_id, 'hydro_raindrop');
+		} else {
+			if (!empty($hydro_id)) {
+				try {
+					$this->client->unregisterUser($hydro_id);
+				} catch (UnregisterUserFailed $e) {
+					$this->enqueue($e->getMessage());
+				}
+			}
+			$this->clean(true);
 		}
 		
-		// Is this a new HYDRO setup? If so, we'll have to show the code validation field.
-		$new_totp = $otpConfig->method !== $this->methodName;
-
 		$hydro_mfa_enabled = (bool)$otpConfig->method == $this->methodName && $hydro_id;
 		$hydro_raindrop_confirmed = (bool)isset($otpConfig->config['hydro_raindrop_confirmed']) ? $otpConfig->config['hydro_raindrop_confirmed'] : false;
 		$message = $this->get_message();
@@ -373,19 +379,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 
 		$hydro_id = $data['hydro_id'];
 
-		$disable_hydro_mfa = isset($data['disable_hydro_mfa']);
-		if ($disable_hydro_mfa) {
-			if (!empty($hydro_id)) {
-				try {
-					$this->client->unregisterUser($hydro_id);
-				} catch (UnregisterUserFailed $e) {
-					$this->enqueue($e->getMessage());
-				}
-			}
-			$this->unset_cookie();
-			return false;
-		}
-
 		if (!empty($hydro_id)) {
 			$length = strlen($hydro_id);
 
@@ -400,7 +393,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			try {
 				$this->client->registerUser($hydro_id);
 
-				$this->unset_cookie();
+				$this->clean();
 
 				return (object)array(
 					'method' => 'hydroraindrop',
@@ -417,7 +410,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 				 * Edge case: A user tries to re-register with Hydro ID. If the user meta has been deleted, the
 				 *            user can re-use his Hydro ID but needs to verify it again.
 				 */
-				$this->unset_cookie();
+				$this->clean();
 
 				return (object)array(
 					'method' => 'hydroraindrop',
@@ -486,7 +479,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			JFactory::getDbo()->updateObject('#__users', $updates, 'id');
 			return true;
 		}
-		$this->enqueue('PLG_TWOFACTORAUTH_HYDRORAINDROP_AUTHENTICATE_ERROR');
+		$this->enqueue('PLG_TWOFACTORAUTH_HYDRORAINDROP_ERR_VALIDATIONFAILED');
 		return false;
 	}
 
@@ -511,7 +504,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 
 		if (!$this->user->guest && $just_logged_in && $hydro_id && $hydro_raindrop_confirmed) {
 			$show_fma = true;
-			$this->unset_cookie();
+			$this->clean();
 		}
 
 		if (!$this->verify_cookie($this->user->id, $hydro_id) && $hydro_id && $hydro_raindrop_confirmed && $just_logged_in) {
@@ -523,12 +516,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			$input = $this->app->input;
 
 			if ($input->get('cancel_hydro_raindrop')) {
-				$this->unset_cookie();
-				$this->session->clear('id', 'hydro_raindrop');
-				$this->session->clear('confirmed', 'hydro_raindrop');
-				$this->session->clear('reauthenticate', 'hydro_raindrop');
-				$this->app->logout(null);
-				$this->app->redirect('/');
+				$this->clean(true, true);
 			}
 
 			$error = null;
@@ -542,7 +530,6 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 					$this->enqueue('PLG_TWOFACTORAUTH_HYDRORAINDROP_LOGIN_COMPLETE', 'success');
 					$this->session->clear('reauthenticate', 'hydro_raindrop');
 					$this->set_cookie($this->user->id, $hydro_id);
-					return;
 				}
 			}
 			
@@ -589,6 +576,36 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			'image' => JURI::root() . 'plugins/twofactorauth/hydroraindrop/images/security-code.png',
 			'is_admin' => !$this->app->isClient('site')
 		);
+	}
+
+	/**
+	 * Cleanup based on params.
+	 *
+	 * @param bool $session Clear the session data.
+	 * @param bool $logout Log the user out.
+	 * 
+	 * @return void
+	 * @throws Exception When message could not be generated.
+	 */
+	private function clean(bool $session = false, bool $logout = false) : void
+	{
+		// check if the user in on the frontend
+		if (!$this->app->isClient('site'))
+			return;
+		// remove the cookie
+		$this->app->input->cookie->set(self::COOKIE_NAME, '', strtotime('-1 day'), $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
+		if ($session)
+		{
+			$this->session->clear('id', 'hydro_raindrop');
+			$this->session->clear('confirmed', 'hydro_raindrop');
+			$this->session->clear('reauthenticate', 'hydro_raindrop');
+			$this->session->clear('message', 'hydro_raindrop');
+		}
+		if ($logout)
+		{
+			$this->app->logout(null);
+			$this->app->redirect('/');
+		}
 	}
 
 	/**
@@ -729,14 +746,5 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			return false;
 		}
 		return true;
-	}
-
-	/**
-	 * Unset the Hydro Raindrop MFA cookie
-	 *
-	 * @return void
-	 */
-	public function unset_cookie() {
-		$this->app->input->cookie->set(self::COOKIE_NAME, '', strtotime('-1 day'), $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
 	}
 }
