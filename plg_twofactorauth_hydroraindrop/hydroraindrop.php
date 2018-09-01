@@ -413,6 +413,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 					'otep' => array()
 				);
 			} catch (RegisterUserFailed $e) {
+				$this->clean(true);
 				$this->enqueue($e->getMessage());
 			}
 		}
