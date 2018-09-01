@@ -37,7 +37,7 @@ final class pkg_hydroraindropInstallerScript
 	 */
     public function install(JAdapterInstance $adapter)
     {
-        $db  = JFactory::getDbo();
+        $db = JFactory::getDbo();
 		$query = $db->getQuery(true);
 		$query->update('#__extensions');
 		$query->set($db->qn('enabled') . ' = ' . $db->q(1));
@@ -57,7 +57,15 @@ final class pkg_hydroraindropInstallerScript
 	 */
 	public function uninstall(JAdapterInstance $adapter)
     {
-        
+        $db = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$conditions = array(
+			$db->quoteName('profile_key') . ' = ' . $db->quote('profile.HydroRaindropToken')
+		);
+		$query->delete($db->quoteName('#__user_profiles'));
+		$query->where($conditions);
+		$db->setQuery($query);
+		$db->execute();
 		return true;
     }
 }
