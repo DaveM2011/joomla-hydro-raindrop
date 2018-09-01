@@ -85,4 +85,23 @@ final class Hydro_Raindrop_TokenStorage implements TokenStorage
 		$db->setQuery($query);
 		$db->execute();
 	}
+
+	/**
+	 * @param string|int $user_id
+	 * @return void
+	 */
+	public function unsetAccessTokenForUser($user_id)
+	{
+		$user = JFactory::getUser();
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		$conditions = array(
+			$db->quoteName('user_id') . ' = ' . $user_id,
+			$db->quoteName('profile_key') . ' = ' . $db->quote('profile.HydroRaindropToken')
+		);
+		$query->delete($db->quoteName('#__user_profiles'));
+		$query->where($conditions);
+		$db->setQuery($query);
+		$db->execute();
+	}
 }

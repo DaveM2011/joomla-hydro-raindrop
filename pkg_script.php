@@ -22,7 +22,9 @@ final class pkg_hydroraindropInstallerScript
     public function postflight($route, JAdapterInstance $adapter)
     {
         if (in_array($route, array('install', 'update', 'discover_install'))) {
-			$this->install($adapter);
+			return $this->install($adapter);
+		} else if ($route == 'uninstall') {
+			return $this->uninstall($adapter);
 		}
     }
 	
@@ -43,5 +45,19 @@ final class pkg_hydroraindropInstallerScript
 		$query->where($db->qn('folder') . ' = ' . $db->q('system'));
 		$db->setQuery($query);
 		$db->execute();
+		return true;
+	}
+
+	/**
+	 * Called on uninstallation
+	 *
+	 * @param   JAdapterInstance  $adapter  The object responsible for running this script
+	 *
+	 * @return  boolean  True on success
+	 */
+	public function uninstall(JAdapterInstance $adapter)
+    {
+        
+		return true;
     }
 }

@@ -377,6 +377,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			return false;
 		}
 
+		$user_id = isset($rawData['id']) ? $rawData['id'] : $this->user->id;
 		$hydro_id = $data['hydro_id'];
 		
 		if (!empty($hydro_id)) {
@@ -388,12 +389,13 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			}
 
 			$model = new UsersModelUser;
-			$otp = $model->getOtpConfig($this->user->id);
+			$otp = $model->getOtpConfig($user_id);
 
 			try {
-				$this->client->registerUser($hydro_id);
+				// clean first
+				$this->clean(false, false, $user_id);
 
-				$this->clean();
+				$this->client->registerUser($hydro_id);
 
 				return (object)array(
 					'method' => 'hydroraindrop',
@@ -410,7 +412,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 				 * Edge case: A user tries to re-register with Hydro ID. If the user meta has been deleted, the
 				 *            user can re-use his Hydro ID but needs to verify it again.
 				 */
-				$this->clean();
+				$this->clean(false, false, $user_id);
 
 				return (object)array(
 					'method' => 'hydroraindrop',
@@ -421,7 +423,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 					'otep' => array()
 				);
 			} catch (RegisterUserFailed $e) {
-				$this->clean(true);
+				$this->clean(true, false, $user_id);
 				$this->enqueue($e->getMessage());
 			}
 		}
@@ -590,15 +592,17 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 *
 	 * @param bool $session Clear the session data.
 	 * @param bool $logout Log the user out.
-	 * 
+	 * @param string $user_id If passed remove the token for user id.
 	 * @throws Exception When message could not be generated.
 	 */
-	private function clean(bool $session = false, bool $logout = false)
+	private function clean(bool $session = false, bool $logout = false, $user_id = null)
 	{
 		// check if the user in on the frontend
 		if (!$this->validConfig || !$this->app->isClient('site'))
 			return;
-		$this->token_storage->unsetAccessToken();
+		// remove the token
+		if ($user_id)
+			$this->token_storage->unsetAccessTokenForUser($user_id);
 		// remove the cookie
 		$this->app->input->cookie->set(self::COOKIE_NAME, '', strtotime('-1 day'), $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
 		if ($session)
@@ -632,7 +636,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 				} catch (UnregisterUserFailed $e) {
 					$this->enqueue($e->getMessage());
 				}
-				$this->clean(true);
+				$this->clean(true, false, $this->user->id);
 			}
 		}
 	}
