@@ -91,6 +91,13 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	protected $user;
 
 	/**
+	 * Token Storage
+	 *
+	 * @var    Hydro_Raindrop_TokenStorage
+	 */
+	protected $token_storage;
+
+	/**
 	 * Lets create the class
 	 */
 	public function __construct($subject, $config)
@@ -109,6 +116,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			return;
 		$this->validConfig = true;
 
+		$this->token_storage = new Hydro_Raindrop_TokenStorage;
 		// Setup the client
 		$this->client = new Client(
 			new ApiSettings(
@@ -118,7 +126,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 					? new SandboxEnvironment()
 					: new ProductionEnvironment()
 			),
-			new Hydro_Raindrop_TokenStorage,
+			$this->token_storage,
 			$config['application_id']
 		);
 
@@ -590,6 +598,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		// check if the user in on the frontend
 		if (!$this->validConfig || !$this->app->isClient('site'))
 			return;
+		$this->token_storage->unsetAccessToken();
 		// remove the cookie
 		$this->app->input->cookie->set(self::COOKIE_NAME, '', strtotime('-1 day'), $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
 		if ($session)
