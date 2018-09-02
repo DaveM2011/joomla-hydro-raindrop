@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>davem.2011@gmail.com</authorEmail>
 	<authorUrl>https://github.com/DaveM2011/joomla-hydro-raindrop</authorUrl>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<description>PLG_TWOFACTORAUTH_HYDRORAINDROP_XML_DESCRIPTION</description>
 	<files>
 		<filename plugin="hydroraindrop">hydroraindrop.php</filename>

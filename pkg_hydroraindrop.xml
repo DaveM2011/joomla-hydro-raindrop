@@ -8,7 +8,7 @@
 	<author>Dave Morton</author>
 	<authorEmail>davem.2011@gmail.com</authorEmail>
 	<authorUrl>https://github.com/DaveM2011/joomla-hydro-raindrop</authorUrl>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<description>Allows users on your site to use two factor authentication using Hydrogen Raindrop. To use two factor authentication please edit the user profile and enable two factor authentication.</description>
 	<packager>Dave Morton</packager>
 	<packagerurl>https://github.com/DaveM2011/joomla-hydro-raindrop</packagerurl>

@@ -331,6 +331,10 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			include_once __DIR__ . '/tmpl/form.php';
 		}
 
+		/*$cipher = new SimpleCipher();
+		$key = random_bytes(32);
+		$key = new Key('simple', $key);
+		var_dump($cipher->encrypt('253452', $key));*/
 		// Stop output buffering and get the form contents
 		$html = @ob_get_clean();
 
