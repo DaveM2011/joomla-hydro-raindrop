@@ -27,6 +27,8 @@ use Adrenth\Raindrop\Exception\RegisterUserFailed;
 use Adrenth\Raindrop\Exception\UserAlreadyMappedToApplication;
 use Adrenth\Raindrop\Exception\VerifySignatureFailed;
 use Adrenth\Raindrop\Exception\UnregisterUserFailed;
+use Joomla\CMS\Crypt\Cipher\SimpleCipher;
+use Joomla\CMS\Crypt\Key;
 
 require_once __DIR__ . '/hydro-raindrop-token.php';
 
@@ -263,6 +265,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			$this->session->set('id', $otp->config['hydro_id'], 'hydro_raindrop');
 			$this->session->set('confirmed', $otp->config['hydro_raindrop_confirmed'], 'hydro_raindrop');
 			$this->session->set('reauthenticate', true, 'hydro_raindrop');
+			$this->session->set('key', $otp->config['hydro_key'], 'hydro_raindrop');
 		}
 		return true;
 	}
@@ -293,7 +296,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		if (!$this->validConfig) {
 			return false;
 		}
-		
+
 		JHtml::_('jquery.framework');
 		$document = JFactory::getDocument();
 		$document->addStyleSheet(Juri::root() . 'plugins/twofactorauth/hydroraindrop/hydro-raindrop-public.css');
@@ -303,6 +306,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		if ($otpConfig->method === $this->methodName) {
 			// This method is already activated. Reuse the same hydro id.
 			$this->session->set('id', $hydro_id, 'hydro_raindrop');
+			$this->session->set('key', isset ($otpConfig->config['hydro_key']) ? $otpConfig->config['hydro_key'] : '', 'hydro_raindrop');
 		}
 		
 		$hydro_mfa_enabled = (bool)$otpConfig->method == $this->methodName && $hydro_id;
@@ -387,9 +391,11 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 				$this->enqueue('PLG_TWOFACTORAUTH_HYDRORAINDROP_PROVIDE_VALID_HYDROID');
 				return false;
 			}
-
+			
 			$model = new UsersModelUser;
 			$otp = $model->getOtpConfig($user_id);
+
+			$cookie_key = bin2hex(random_bytes(32));
 
 			try {
 				// clean first
@@ -401,7 +407,8 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 					'method' => 'hydroraindrop',
 					'config' => array(
 						'hydro_id' => $hydro_id,
-						'hydro_raindrop_confirmed' => $hydro_id == $otp->config['hydro_id'] ? $otp->config['hydro_raindrop_confirmed'] : 0
+						'hydro_raindrop_confirmed' => isset($otp->config['hydro_id']) && $hydro_id == $otp->config['hydro_id'] ? $otp->config['hydro_raindrop_confirmed'] : 0,
+						'hydro_key' => isset($otp->config['hydro_key']) ? $otp->config['hydro_key'] : $cookie_key
 					),
 					'otep' => array()
 				);
@@ -418,7 +425,8 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 					'method' => 'hydroraindrop',
 					'config' => array(
 						'hydro_id' => $hydro_id,
-						'hydro_raindrop_confirmed' => $hydro_id == $otp->config['hydro_id'] ? $otp->config['hydro_raindrop_confirmed'] : 0
+						'hydro_raindrop_confirmed' => isset($otp->config['hydro_id']) && $hydro_id == $otp->config['hydro_id'] ? $otp->config['hydro_raindrop_confirmed'] : 0,
+						'hydro_key' => isset($otp->config['hydro_key']) ? $otp->config['hydro_key'] : $cookie_key
 					),
 					'otep' => array()
 				);
@@ -469,14 +477,16 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		}
 		$hydro_id = $this->session->get('id', null, 'hydro_raindrop');
 		$message = $this->get_message();
+		$cookie_key = bin2hex(random_bytes(32));
 
 		if ($this->verifyMessage($hydro_id, $message)) {
-			$this->set_cookie($this->user->id, $hydro_id);
+			$this->set_cookie($this->user->id, $hydro_id, $cookie_key);
 			$updates = (object) array(
 				'id'     => $this->user->id,
 				'otpKey' => $this->methodName . ':' . json_encode(array(
 					'hydro_id' => $hydro_id,
-					'hydro_raindrop_confirmed' => 1
+					'hydro_raindrop_confirmed' => 1,
+					'hydro_key' => $cookie_key
 				))
 			);
 			JFactory::getDbo()->updateObject('#__users', $updates, 'id');
@@ -503,6 +513,9 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		$just_logged_in = $this->session->get('reauthenticate', false, 'hydro_raindrop');
 		$hydro_id = $this->session->get('id', null, 'hydro_raindrop');
 		$hydro_raindrop_confirmed = $this->session->get('confirmed', false, 'hydro_raindrop');
+		$cookie_key = $this->session->get('key', null, 'hydro_raindrop');
+		//var_dump($just_logged_in, $hydro_id, $hydro_raindrop_confirmed, $cookie_key);
+
 		$show_fma = false;
 
 		if (!$this->user->guest && $just_logged_in && $hydro_id && $hydro_raindrop_confirmed) {
@@ -510,7 +523,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			$this->clean();
 		}
 
-		if (!$this->verify_cookie($this->user->id, $hydro_id) && $hydro_id && $hydro_raindrop_confirmed && $just_logged_in) {
+		if (!$this->verify_cookie($this->user->id, $hydro_id, $cookie_key) && $hydro_id && $hydro_raindrop_confirmed && $just_logged_in) {
 			$show_fma = true;
 		}
 
@@ -532,7 +545,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 				} else {
 					$this->enqueue('PLG_TWOFACTORAUTH_HYDRORAINDROP_LOGIN_COMPLETE', 'success');
 					$this->session->clear('reauthenticate', 'hydro_raindrop');
-					$this->set_cookie($this->user->id, $hydro_id);
+					$this->set_cookie($this->user->id, $hydro_id, $cookie_key);
 					return;
 				}
 			}
@@ -608,6 +621,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 		if ($session)
 		{
 			$this->session->clear('id', 'hydro_raindrop');
+			$this->session->clear('key', 'hydro_raindrop');
 			$this->session->clear('confirmed', 'hydro_raindrop');
 			$this->session->clear('reauthenticate', 'hydro_raindrop');
 			$this->session->clear('message', 'hydro_raindrop');
@@ -669,36 +683,15 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	}
 
 	/**
-	 * Generates the salt which will be used for hashing and encrypting.
-	 *
-	 * @return string
-	 */
-	private function get_salt() : string
-	{
-		if (defined('AUTH_SALT')) {
-			return AUTH_SALT;
-		}
-		return sha1(base64_encode(JFactory::getConfig()->get('secret')));
-		/*$salt = ''; // remove later
-		if (file_exists(__DIR__ . '/salt.key')) {
-			$salt = file_get_contents(__DIR__ . '/salt.key');
-		} else {
-			$salt = random_bytes(32);
-			file_put_contents(__DIR__ . '/salt.key', $salt);
-		}
-		return $salt;*/
-	}
-
-	/**
 	 * Perform Hash Mac on data and return hash.
 	 *
 	 * @param string $data Data to hash.
 	 *
 	 * @return string
 	 */
-	private function hash_hmac(string $data) : string
+	private function hash_hmac(string $data, string $salt) : string
 	{
-		return hash_hmac('sha1', $data, $this->get_salt());
+		return hash_hmac('sha1', $data, $salt);
 	}
 
 	/**
@@ -709,13 +702,15 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 *
 	 * @return string
 	 */
-	private function get_cookie_value($user_id, $hydro_id, string $cookie_name) : string
+	private function get_cookie_value($user_id, $hydro_id, string $cookie_name, string $cookie_key) : string
 	{
-		$salt = $this->get_salt();
-		$user_hash = sha1(md5($user_id));
+		$cipher = new SimpleCipher();
+		$key = new Key('simple', hex2bin($cookie_key));
+
+		$user_hash = $cipher->encrypt($user_id, $key);
 		$expire = strtotime('+24 hours');
-		$value = base64_encode(sprintf('%s|%s|%s|%s', $cookie_name, $user_hash, $hydro_id, $expire));
-		$signature = $this->hash_hmac($value);
+		$value = $cipher->encrypt(sprintf('%s|%s|%s|%s', $cookie_name, $user_hash, $hydro_id, $expire), $key);
+		$signature = $this->hash_hmac($value, $cookie_key);
 		return $value . '|' . $signature;
 	}
 
@@ -725,9 +720,9 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 * @param int $user_id Current logged in user.
 	 * @param string $hydro_id The users hydro_id.
 	 */
-	private function set_cookie($user_id, $hydro_id)
+	private function set_cookie(string $user_id, string $hydro_id, string $cookie_key)
 	{
-		$cookie = $this->get_cookie_value($user_id, $hydro_id, self::COOKIE_NAME);
+		$cookie = $this->get_cookie_value($user_id, $hydro_id, self::COOKIE_NAME, $cookie_key);
 		$this->app->input->cookie->set(self::COOKIE_NAME, $cookie, 0, $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
 	}
 
@@ -739,8 +734,13 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	 *
 	 * @return bool
 	 */
-	private function verify_cookie($userId, $hydroId) : bool
+	private function verify_cookie($userId, $hydroId, $cookie_key) : bool
 	{
+		if (!$cookie_key)
+			return false;
+		$cipher = new SimpleCipher();
+		$key = new Key('simple', null, hex2bin($cookie_key));
+
 		$cookie = $this->app->input->cookie->get(self::COOKIE_NAME, null, 'string');
 		if (!$cookie) {
 			//$this->log('Cookie is not set.');
@@ -753,14 +753,14 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			return false;
 		}
 		// @codingStandardsIgnoreLine
-		list($b64_value, $cookie_signature) = $cookie_list;
-		$signature = $this->hash_hmac($b64_value);
-		if ($this->hash_hmac($signature) !== $this->hash_hmac($cookie_signature)) {
+		list($cookie_value, $cookie_signature) = $cookie_list;
+		$signature = $this->hash_hmac($cookie_value, $cookie_key);
+		if ($this->hash_hmac($signature, $cookie_key) !== $this->hash_hmac($cookie_signature, $cookie_key)) {
 			$this->enqueue('Cookie signature invalid.');
 			return false;
 		}
 		// @codingStandardsIgnoreLine
-		$cookie_content = explode('|', base64_decode($b64_value));
+		$cookie_content = explode('|', $cipher->decrypt($cookie_value, $key));
 		if (count($cookie_content) !== 4) {
 			$this->enqueue('Cookie contents are not valid (4).');
 			return false;
