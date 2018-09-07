@@ -435,6 +435,8 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 					'otep' => array()
 				);
 			} catch (RegisterUserFailed $e) {
+				var_dump($e);
+				exit;
 				$this->clean(true, false, $user_id);
 				$this->enqueue($e->getMessage());
 			}
@@ -527,7 +529,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			$this->clean();
 		}
 
-		if (!$this->verify_cookie($this->user->id, $hydro_id, $cookie_key) && $hydro_id && $hydro_raindrop_confirmed && $just_logged_in) {
+		if ($hydro_id && $hydro_raindrop_confirmed && $just_logged_in && !$this->verify_cookie($this->user->id, $hydro_id, $cookie_key)) {
 			$show_fma = true;
 		}
 
@@ -615,14 +617,30 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 	private function clean(bool $session = false, bool $logout = false, $user_id = null)
 	{
 		// check if the user in on the frontend
-		if (!$this->validConfig || !$this->app->isClient('site'))
+		if (!$this->validConfig)
 			return;
+		
 		// remove the token
 		if ($user_id)
 			$this->token_storage->unsetAccessTokenForUser($user_id);
-		// remove the cookie
-		$this->app->input->cookie->set(self::COOKIE_NAME, '', strtotime('-1 day'), $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
-		if ($session)
+		/*if ($user_id && $token)
+		{
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true);
+			$conditions = array(
+				$db->quoteName('user_id') . ' = ' . $user_id,
+				$db->quoteName('profile_key') . ' = ' . $db->quote('profile.HydroRaindropToken')
+			);
+			$query->delete($db->quoteName('#__user_profiles'));
+			$query->where($conditions);
+			$db->setQuery($query);
+			$db->execute();
+		}*/
+		// remove the cookie only if on the frontend
+		if (!$this->app->isClient('site') || $this->user->id == $user_id)
+			$this->app->input->cookie->set(self::COOKIE_NAME, '', strtotime('-1 day'), $this->app->get('cookie_path', '/'), $this->app->get('cookie_domain'), $this->app->isSSLConnection());
+		// clear the session data only if on frontend or unless you are the user your managing
+		if ($session && (!$this->app->isClient('site') || $this->user->id == $user_id))
 		{
 			$this->session->clear('id', 'hydro_raindrop');
 			$this->session->clear('key', 'hydro_raindrop');
