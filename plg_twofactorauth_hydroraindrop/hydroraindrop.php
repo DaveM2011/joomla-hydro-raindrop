@@ -435,10 +435,8 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 					'otep' => array()
 				);
 			} catch (RegisterUserFailed $e) {
-				var_dump($e);
-				exit;
 				$this->clean(true, false, $user_id);
-				$this->enqueue($e->getMessage());
+				$this->enqueue('PLG_TWOFACTORAUTH_HYDRORAINDROP_REG_ERROR');
 			}
 		}
 		return false;
@@ -471,7 +469,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 			if ($data)
 				return true;
 		} catch (VerifySignatureFailed $e) {
-			$this->enqueue($e->getMessage());
+			$this->enqueue('PLG_TWOFACTORAUTH_HYDRORAINDROP_SIG_ERROR');
 		}
 		return false;
 	}
@@ -670,7 +668,7 @@ final class PlgTwofactorauthHydroraindrop extends JPlugin
 				try {
 					$this->client->unregisterUser($hydro_id);
 				} catch (UnregisterUserFailed $e) {
-					$this->enqueue($e->getMessage());
+					$this->enqueue('PLG_TWOFACTORAUTH_HYDRORAINDROP_UNREG_ERROR');
 				}
 				$this->clean(true, false, $this->user->id);
 			}
